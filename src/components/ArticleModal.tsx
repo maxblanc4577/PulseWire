@@ -105,6 +105,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
   const [currentSpeechIndex, setCurrentSpeechIndex] = useState(0);
   const [speechRate, setSpeechRate] = useState<number>(1.0);
   const [currentWord, setCurrentWord] = useState<string>('');
+  const [speechNotice, setSpeechNotice] = useState<string | null>(null);
   const speechUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const isSpeechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -229,7 +230,8 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
   // Master speech toggle button
   const handleToggleSpeech = useCallback(() => {
     if (!isSpeechSupported) {
-      alert("Web Speech API is not supported in this browser. Please use Chrome, Edge, Safari, or Firefox.");
+      setSpeechNotice("Web Speech API is not supported in this browser. Please use Chrome, Edge, Safari, or Firefox to listen.");
+      setTimeout(() => setSpeechNotice(null), 6000);
       return;
     }
 
@@ -947,6 +949,19 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           {/* REAL WEB SPEECH API AUDIO DISPATCH NARRATION PLAYER */}
           <div className="bg-neutral-950 text-white rounded-2xl p-5 sm:p-6 space-y-4 border border-neutral-800 shadow-lg relative overflow-hidden print:hidden">
             
+            {/* Ambient Notification */}
+            {speechNotice && (
+              <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-200 text-xs flex items-center justify-between animate-in fade-in duration-200">
+                <span>{speechNotice}</span>
+                <button 
+                  onClick={() => setSpeechNotice(null)}
+                  className="p-1 hover:text-white text-amber-300 ml-2"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
             {/* Background Ambient Glow */}
             {speechStatus === 'playing' && (
               <div className="absolute top-0 right-0 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none animate-pulse" />

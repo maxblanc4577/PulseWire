@@ -42,8 +42,30 @@ export default function App() {
     resetToDefaults
   } = useArticlesManager();
 
-  // Bookmarking hook connected to localStorage
-  const { savedIds, savedCount, toggleBookmark, isBookmarked, clearAllBookmarks } = useBookmarks();
+  // Bookmarking & recently viewed hook connected to localStorage
+  const { 
+    savedIds, 
+    savedCount, 
+    toggleBookmark, 
+    isBookmarked, 
+    clearAllBookmarks,
+    recentlyViewedIds,
+    trackRecentlyViewed,
+    removeRecentlyViewed,
+    clearRecentlyViewed
+  } = useBookmarks();
+
+  const handleSelectArticle = (article: Article) => {
+    setSelectedArticle(article);
+    trackRecentlyViewed(article.id);
+  };
+
+  // Ensure any article selection triggers recently viewed tracking
+  useEffect(() => {
+    if (selectedArticle) {
+      trackRecentlyViewed(selectedArticle.id);
+    }
+  }, [selectedArticle, trackRecentlyViewed]);
 
   // Keyboard shortcut listener: Cmd/Ctrl + K to search, Escape to close modals
   useEffect(() => {
@@ -85,7 +107,7 @@ export default function App() {
         <MainContent
           articles={articles}
           vitalityMetrics={vitalityMetrics}
-          onSelectArticle={(article) => setSelectedArticle(article)}
+          onSelectArticle={handleSelectArticle}
           onSelectPublication={(pub) => setSelectedPublication(pub)}
           onOpenSupport={() => setIsSupportOpen(true)}
           selectedPillarId={selectedPillarId}
@@ -127,20 +149,23 @@ export default function App() {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         articles={articles}
-        onSelectArticle={(article) => setSelectedArticle(article)}
+        onSelectArticle={handleSelectArticle}
         onSelectPillar={(pillarId) => setSelectedPillarId(pillarId)}
         onSelectRegion={(regionId) => setSelectedRegionId(regionId)}
       />
 
-      {/* Saved Articles / Bookmarks Drawer Modal */}
+      {/* Saved Articles & Recently Viewed / Read Drawer Modal */}
       <SavedArticlesModal
         isOpen={isSavedOpen}
         onClose={() => setIsSavedOpen(false)}
         articles={articles}
         savedIds={savedIds}
+        recentlyViewedIds={recentlyViewedIds}
         onToggleBookmark={toggleBookmark}
         onClearAll={clearAllBookmarks}
-        onSelectArticle={(article) => setSelectedArticle(article)}
+        onClearRecentlyViewed={clearRecentlyViewed}
+        onRemoveRecentlyViewed={removeRecentlyViewed}
+        onSelectArticle={handleSelectArticle}
       />
 
       {/* Independent Mission Support Modal */}
@@ -171,7 +196,7 @@ export default function App() {
         onSetFeaturedLead={setFeaturedLead}
         onUpdateVitalityMetric={updateVitalityMetric}
         onResetToDefaults={resetToDefaults}
-        onSelectArticlePreview={(art) => setSelectedArticle(art)}
+        onSelectArticlePreview={handleSelectArticle}
         initialEditingArticleId={adminEditingArticleId}
       />
 
