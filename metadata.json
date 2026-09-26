@@ -1,0 +1,6 @@
+{
+  "name": "Pulsewire - Global Development & Intelligence",
+  "description": "Independent development intelligence, climate resilience tracking, and field dispatches circulated exclusively across the Commonwealth of Dominica and the Caribbean.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
